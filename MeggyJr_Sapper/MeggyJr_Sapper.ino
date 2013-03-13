@@ -1,54 +1,25 @@
 /*
- MeggyJr_Sapper.pde
+ MeggyJr_Sapper
  Minesweeper clone for the Meggy Jr RGB.
- 
- Number of surrounding mines is indicated with color as follows:
-     0 - black
-     1 - blue
-     2 - green
-     3 - yellow
-     4 - orange
-     5 - bright blue
-     6 - bright green
-     7 - bright yellow
-     8 - bright orange
- The exact number of surrounding mines at the current cursor position
- is also indicated with auxillary LEDs.
 
- Mines are red, flags are violet, your cursor is white.
- 
- Use directional keys to move the cursor, "A" to flag and "B" to
- reveal the current cell. Pressing "B" on a cell that is already
- open will perform the equivalent of a two-button click.
-
- Changelog:
- 
-   Version 1.1, 31-May-2009
-   - Added button repeat (can hold down d-buttons).
-   - Added first-click immunity.
-   - Now smaller and with less repeated code.
-
-   Version 1.0, 31-May-2009
-   - Initial version.
-   
  Copyright (c) 2009 Simon Ratner. All right reserved.
- 
+ <https://github.com/simonratner/meggy-jr-rgb>
+
  This library is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this library.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
-#include <MeggyJrSimple.h>    // Required code, line 1 of 2.
+#include <MeggyJrSimple.h>
 
 #define MineColor1     CustomColor4
 #define MineColor2     CustomColor5
@@ -84,7 +55,7 @@ byte SpecialColor[] = {
   FlagColor1,  // Mine | Flag
   FlagColor1,  // Mine | Flag | Hidden
 };
-      
+
 #define MAX_MINES 10
 byte mines;
 byte flags;
@@ -114,7 +85,7 @@ void forEach(void (*op)(byte, byte, void*), void* context)
   }
 }
 
-// execute op(x, y, context) for each cell that is within radius r of 
+// execute op(x, y, context) for each cell that is within radius r of
 // the specified reference cell.
 void forEachNeighbor(byte refx, byte refy, byte r, void (*op)(byte, byte, void*), void* context)
 {
@@ -129,12 +100,13 @@ void forEachNeighbor(byte refx, byte refy, byte r, void (*op)(byte, byte, void*)
 void playTune(unsigned int* freqs, int count, int tempo)
 {
   for (int i = 0; i < count; ++i) {
-    Tone_Start(freqs[i], tempo); 
-    while (MakingSound) {}     
+    Tone_Start(freqs[i], tempo);
+    while (MakingSound) {}
   }
 }
 
-void setup()                    // run once, when the sketch starts
+// run once, when the sketch starts
+void setup()
 {
   MeggyJrSimpleSetup();
   EditColor(Blue,      0,  6, 4);
@@ -148,7 +120,7 @@ void setup()                    // run once, when the sketch starts
   EditColor(CustomColor0,  1, 6, 1);  // HiddenColor
   EditColor(CustomColor4, 10, 0, 0);  // MineColor1
   EditColor(CustomColor5,  2, 0, 0);  // MineColor2
-  
+
   gameFunc = splash;
 }
 
@@ -241,7 +213,7 @@ void renderPx(byte x, byte y, void* context)
     DrawPx(x, y, SpecialColor[flags]);
   } else {
     DrawPx(x, y, MarkerColor[getMines(x, y)]);
-  }  
+  }
 }
 
 // splash screen func
@@ -250,15 +222,15 @@ void splash()
   // spinning LEDs
   int t = (millis() / 60) % 14;
   SetAuxLEDs(t < 7 ? (1 << t) : (1 << (14 - t)));
-  
+
   CheckButtonsPress();
   if (Button_A | Button_B) {
     unsigned int freqs[3] = {5730, 0, 7648};
     playTune(freqs, 3, 50);
- 
+
     // clear the field
     forEach(&setHidden, NULL);
- 
+
     // reset colors in case they were previously animating
     SpecialColor[2] = FlagColor1;
     SpecialColor[4] = MineColor1;
@@ -267,7 +239,7 @@ void splash()
     cursory = 7;
 
     gameFunc = play;
-  }    
+  }
 }
 
 // loser func
@@ -275,18 +247,11 @@ void lose()
 {
   unsigned int cycle[5] = {600, 800, 1000, 1200, 2400};
 
-  Meg.SoundState(1);        
-  for (int i = 0; i < 5; ++i) {
-    for (int j = 0; j < cycle[i]; ++j) {
-      OCR1A = rand(); // Noise!
-      for (int t = 0; t < 200; ++t) {
-        asm("nop");
-      }
+  for (unsigned int i = 0; i < 5; ++i) {
+    for (unsigned int j = 0; j < cycle[i]; ++j) {
+      Tone_Start(rand() * (1 - (i & 1)), 10);
     }
-    Meg.SoundState(i & 1);
   }
-  OCR1A = 0;
-  Meg.SoundState(0);
   gameFunc = gameOver;
 }
 
@@ -314,7 +279,7 @@ void play()
 {
   // we do some custom button handling because the way
   // MJSL does it isn't quite right for our purpose.
-  byte buttons = Meg.GetButtons(); 
+  byte buttons = Meg.GetButtons();
   byte buttonsDelta = buttons & ~(lastButtonState);
   Button_Up = (buttonsDelta & 4);
   Button_Down = (buttonsDelta & 8);
@@ -328,10 +293,10 @@ void play()
     Button_Left = (buttons & 16);
     Button_Right = (buttons & 32);
     lastButtonTime = millis();
-  }  
-  Button_B  = (buttonsDelta & 1);      
-  Button_A = (buttonsDelta & 2);     
-  
+  }
+  Button_B  = (buttonsDelta & 1);
+  Button_A = (buttonsDelta & 2);
+
   if (Button_Up) {
     cursory = (cursory + 1) % 8;
   }
@@ -363,7 +328,7 @@ void play()
   } else {
     SetAuxLEDs((1 << getMines(cursorx, cursory)) - 1);
   }
-  
+
   if ((hidden == mines) && (flags == mines)) {
     // finished!
     forEach(&clearHidden, NULL);
@@ -372,18 +337,18 @@ void play()
 
   // render the field
   forEach(&renderPx, NULL);
-    
+
   // suppress cursor while the buttons are down
-  Button_B  = (buttons & 1);      
-  Button_A = (buttons & 2);     
+  Button_B  = (buttons & 1);
+  Button_A = (buttons & 2);
   if (!Button_A && !Button_B) {
     DrawPx(cursorx, cursory, CursorColor);
   }
   lastButtonState = buttons;
 }
 
-void loop()                     // run over and over again
+void loop()
 {
   gameFunc();
-  DisplaySlate();      // Write the updated game buffer to the screen.
+  DisplaySlate();  // write the updated game buffer to the screen
 }
