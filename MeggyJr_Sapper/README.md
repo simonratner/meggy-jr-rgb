@@ -20,8 +20,8 @@ auxiliary LEDs. It is also shown with color, as follows:
 Mines are red, flags are violet, your cursor is white.
 
 Use directional keys to move the cursor, ``A`` to flag and ``B`` to reveal the
-current cell. Pressing "B" on a cell that is already revealed will also reveal
-all unflagged cells around it.
+current cell. Pressing ``B`` on a revealed cell will also reveal all unflagged
+cells around it.
 
 Changelog
 ---------
