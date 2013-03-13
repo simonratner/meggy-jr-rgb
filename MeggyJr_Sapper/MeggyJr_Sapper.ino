@@ -56,6 +56,11 @@ byte SpecialColor[] = {
   FlagColor1,  // Mine | Flag | Hidden
 };
 
+#define len(arr) (sizeof(arr)/sizeof(arr[0]))
+unsigned int TuneBlip[3] = {5730, 0, 7648};
+unsigned int TuneWin[5] = {7648, 0, 5730, 0, 4048};
+unsigned int TuneLose[5] = {600, 800, 1000, 1200, 2400};
+
 #define MAX_MINES 10
 byte mines;
 byte flags;
@@ -96,34 +101,6 @@ void forEachNeighbor(byte refx, byte refy, byte r, void (*op)(byte, byte, void*)
   }
 }
 
-// play a sequence of notes synchronously.
-void playTune(unsigned int* freqs, int count, int tempo)
-{
-  for (int i = 0; i < count; ++i) {
-    Tone_Start(freqs[i], tempo);
-    while (MakingSound) {}
-  }
-}
-
-// run once, when the sketch starts
-void setup()
-{
-  MeggyJrSimpleSetup();
-  EditColor(Blue,      0,  6, 4);
-  EditColor(Green,     0, 10, 0);
-  EditColor(Yellow,   10, 10, 0);
-  EditColor(Orange,   10,  2, 0);
-  EditColor(DimBlue,   0,  1, 1);
-  EditColor(DimGreen,  0,  2, 0);
-  EditColor(DimYellow, 3,  3, 0);
-  EditColor(DimOrange, 3,  1, 0);
-  EditColor(CustomColor0,  1, 6, 1);  // HiddenColor
-  EditColor(CustomColor4, 10, 0, 0);  // MineColor1
-  EditColor(CustomColor5,  2, 0, 0);  // MineColor2
-
-  gameFunc = splash;
-}
-
 void setHidden(byte x, byte y, void* context)
 {
   field[y][x] = Hidden;
@@ -142,23 +119,6 @@ void incrementMines(byte x, byte y, void* context)
 {
   if (!(field[y][x] & Mine)) {
     field[y][x]++;
-  }
-}
-
-// generate a new playing field, ensuring that no mines are placed
-// at the specified coordinates.
-void generate(byte immunex, byte immuney)
-{
-  randomSeed(millis());
-  for (mines = 0; mines < MAX_MINES; ++mines) {
-    byte x, y;
-    do {
-      x = random(0, 8);
-      y = random(0, 8);
-    } while (field[y][x] & Mine || (x == immunex && y == immuney));
-    // place a new mine
-    field[y][x] |= Mine;
-    forEachNeighbor(x, y, 1, &incrementMines, NULL);
   }
 }
 
@@ -225,8 +185,7 @@ void splash()
 
   CheckButtonsPress();
   if (Button_A | Button_B) {
-    unsigned int freqs[3] = {5730, 0, 7648};
-    playTune(freqs, 3, 50);
+    playTune(TuneBlip, len(TuneBlip), 50);
 
     // clear the field
     forEach(&setHidden, NULL);
@@ -245,21 +204,14 @@ void splash()
 // loser func
 void lose()
 {
-  unsigned int cycle[5] = {600, 800, 1000, 1200, 2400};
-
-  for (unsigned int i = 0; i < 5; ++i) {
-    for (unsigned int j = 0; j < cycle[i]; ++j) {
-      Tone_Start(rand() * (1 - (i & 1)), 10);
-    }
-  }
+  playNoise(TuneLose, len(TuneLose));
   gameFunc = gameOver;
 }
 
 // winner func
 void win()
 {
-  unsigned int freqs[5] = {7648, 0, 5730, 0, 4048};
-  playTune(freqs, 5, 50);
+  playTune(TuneWin, len(TuneWin), 50);
   gameFunc = gameOver;
 }
 
@@ -345,6 +297,62 @@ void play()
     DrawPx(cursorx, cursory, CursorColor);
   }
   lastButtonState = buttons;
+}
+
+// generate a new playing field, ensuring that no mines are placed
+// at the specified coordinates.
+void generate(byte immunex, byte immuney)
+{
+  randomSeed(millis());
+  for (mines = 0; mines < MAX_MINES; ++mines) {
+    byte x, y;
+    do {
+      x = random(0, 8);
+      y = random(0, 8);
+    } while (field[y][x] & Mine || (x == immunex && y == immuney));
+    // place a new mine
+    field[y][x] |= Mine;
+    forEachNeighbor(x, y, 1, &incrementMines, NULL);
+  }
+}
+
+// play a sequence of notes synchronously.
+void playTune(unsigned int* freqs, int count, int tempo)
+{
+  for (int i = 0; i < count; ++i) {
+    Tone_Start(freqs[i], tempo);
+    while (MakingSound) {}
+  }
+}
+
+// play a sequence of noise bursts synchronously, `bursts` is
+// an array of alternating burst and pause durations.
+void playNoise(unsigned int* bursts, int count)
+{
+  for (int i = 0; i < count; ++i) {
+    for (unsigned int j = 0; j < bursts[i]; ++j) {
+      Tone_Start(rand() * (1 - (i & 1)), 10);
+    }
+  }
+}
+
+// run once, when the sketch starts.
+void setup()
+{
+  MeggyJrSimpleSetup();
+  EditColor(Blue,      0,  6, 4);
+  EditColor(Green,     0, 10, 0);
+  EditColor(Yellow,   10, 10, 0);
+  EditColor(Orange,   10,  2, 0);
+  EditColor(DimBlue,   0,  1, 1);
+  EditColor(DimGreen,  0,  2, 0);
+  EditColor(DimYellow, 3,  3, 0);
+  EditColor(DimOrange, 3,  1, 0);
+  EditColor(CustomColor0,  1, 6, 1);  // HiddenColor
+  EditColor(CustomColor4, 10, 0, 0);  // MineColor1
+  EditColor(CustomColor5,  2, 0, 0);  // MineColor2
+
+  gameFunc = splash;
 }
 
 void loop()
