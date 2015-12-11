@@ -1,0 +1,3 @@
+[submodule "libraries/MeggyJrRGB"]
+	path = libraries/MeggyJrRGB
+	url = https://github.com/evil-mad/MeggyJrRGB.git
