@@ -129,6 +129,17 @@ void accumulateFlags(byte x, byte y, void* context)
   }
 }
 
+// forward decls
+void splash();
+void play();
+void win();
+void lose();
+void gameOver();
+void playTune(unsigned int*, int, int);
+void playNoise(unsigned int*, int);
+void generate(byte, byte);
+void reveal(byte, byte);
+
 void revealFloodFill(byte x, byte y, void* context)
 {
   if (field[y][x] & Hidden) {
