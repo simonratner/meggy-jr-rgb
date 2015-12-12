@@ -5,19 +5,16 @@ Minesweeper clone for the [Meggy Jr RGB](http://shop.evilmadscientist.com/produc
 Gameplay
 --------
 Number of surrounding mines at the current cursor position is indicated with
-auxiliary LEDs. It is also shown with color, as follows:
+auxiliary LEDs. It is also shown with increasing color intensity, from green
+to yellow.
 
-      0 - black
-      1 - blue
-      2 - green
-      3 - yellow
-      4 - orange
-      5 - bright blue
-      6 - bright green
-      7 - bright yellow
-      8 - bright orange
+    0 - off
+    1 - green
+    ...
+    8 - yellow
 
-Mines are red, flags are violet, your cursor is white.
+Mines are red, flags are blue, your cursor is white (or pink, if you have one
+of the older boards with low intensity green LEDs).
 
 Use directional keys to move the cursor, ``A`` to flag and ``B`` to reveal the
 current cell. Pressing ``B`` on a revealed cell will also reveal all unflagged
@@ -25,6 +22,15 @@ cells around it.
 
 Changelog
 ---------
+Version 1.2, 11-Dec-2015
+
+* Changed color mine indicators to use intensity instead of distinct colors.
+* Updated to work with latest arduino version.
+* Added makefile, build and upload with:
+  * `make`
+  * `make upload`
+* Added separate license file.
+
 Version 1.1, 31-May-2009
 
 * Added button repeat (can hold down d-buttons).
@@ -37,17 +43,4 @@ Version 1.0, 31-May-2009
 
 License
 -------
-Copyright (c) 2009 Simon Ratner. All right reserved.
- 
-This library is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this library. If not, see <http://www.gnu.org/licenses/>.
+[GPL-3.0](LICENSE)

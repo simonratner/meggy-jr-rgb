@@ -21,23 +21,23 @@
 
 #include <MeggyJrSimple.h>
 
-#define MineColor1     CustomColor4
-#define MineColor2     CustomColor5
-#define FlagColor1     Violet
-#define FlagColor2     DimViolet
-#define HiddenColor    CustomColor0
+#define MineColor1     Red
+#define MineColor2     DimRed
+#define FlagColor1     Blue
+#define FlagColor2     DimBlue
+#define HiddenColor    CustomColor9
 #define CursorColor    White
 
 byte MarkerColor[] = {
-  Dark,
-  DimBlue,   // 1
-  DimGreen,  // 2
-  DimYellow, // 3
-  DimOrange, // 4
-  Blue,      // 5
-  Green,     // 6
-  Yellow,    // 7
-  Orange,    // 8
+  CustomColor0,
+  CustomColor1,
+  CustomColor2,
+  CustomColor3,
+  CustomColor4,
+  CustomColor5,
+  CustomColor6,
+  CustomColor7,
+  CustomColor8,
 };
 
 // higher 4 bits are used for special flags
@@ -347,21 +347,42 @@ void playNoise(unsigned int* bursts, int count)
   }
 }
 
+void palette() {
+  DrawPx(0, 0, CustomColor1);
+  DrawPx(1, 0, CustomColor2);
+  DrawPx(2, 0, CustomColor3);
+  DrawPx(3, 0, CustomColor4);
+  DrawPx(4, 0, CustomColor5);
+  DrawPx(5, 0, CustomColor6);
+  DrawPx(6, 0, CustomColor7);
+  DrawPx(7, 0, CustomColor8);
+
+  DrawPx(0, 1, MineColor1);
+  DrawPx(1, 1, MineColor2);
+  DrawPx(2, 1, FlagColor1);
+  DrawPx(3, 1, FlagColor2);
+  DrawPx(4, 1, HiddenColor);
+  DrawPx(5, 1, CursorColor);
+}
+
 // run once, when the sketch starts.
 void setup()
 {
   MeggyJrSimpleSetup();
-  EditColor(Blue,      0,  6, 4);
-  EditColor(Green,     0, 10, 0);
-  EditColor(Yellow,   10, 10, 0);
-  EditColor(Orange,   10,  2, 0);
-  EditColor(DimBlue,   0,  1, 1);
-  EditColor(DimGreen,  0,  2, 0);
-  EditColor(DimYellow, 3,  3, 0);
-  EditColor(DimOrange, 3,  1, 0);
-  EditColor(CustomColor0,  1, 6, 1);  // HiddenColor
-  EditColor(CustomColor4, 10, 0, 0);  // MineColor1
-  EditColor(CustomColor5,  2, 0, 0);  // MineColor2
+  EditColor(Red,    15,  2,  0);  // MineColor1
+  EditColor(DimRed,  6,  0,  0);  // MineColor2
+  EditColor(Blue,    2,  0,  8);  // FlagColor1
+  EditColor(DimBlue, 0,  2,  2);  // FlagColor2
+  EditColor(CustomColor0,  0,  0,  0);
+  EditColor(CustomColor1,  0,  2,  0);
+  EditColor(CustomColor2,  1,  6,  0);
+  EditColor(CustomColor3,  2, 11,  0);
+  EditColor(CustomColor4,  4, 14,  0);
+  EditColor(CustomColor5,  6, 15,  0);
+  EditColor(CustomColor6,  9, 15,  0);
+  EditColor(CustomColor7, 12, 15,  0);
+  EditColor(CustomColor8, 15, 15,  0);
+  EditColor(CustomColor9,  1,  6,  1);  // HiddenColor
 
   gameFunc = splash;
 }
